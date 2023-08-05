@@ -79,7 +79,7 @@ def get_seed_nodes(  # noqa: C901
 
     if (
         monero_network not in NETWORK_MODES
-        and not monero_network == ALL_NETWORK_MDOES
+        and monero_network != ALL_NETWORK_MDOES
     ):
         log.error(f"This is no known monero network mode: '{monero_network}'.")
         sys.exit(1)
@@ -107,17 +107,15 @@ def get_seed_nodes(  # noqa: C901
     except (RequestException) as e:
         log.error(f"Cannot get information from '{url}', because: '{str(e)}'.")
 
-    for i, line in enumerate(lines):
-        line = line.strip()
-        if line:
+    for line in lines:
+        if line := line.strip():
             if start_line.search(line):
                 interesting_range = True
             if end_line.match(line) and interesting_range:
                 interesting_range = False
                 break
             if interesting_range:
-                seed_node_match = seed_node_line.match(line)
-                if seed_node_match:
+                if seed_node_match := seed_node_line.match(line):
                     seed_node_info = seed_node_match.groups()
                     seed_node = seed_node_info[0]
                     node_port = int(seed_node_info[1])
@@ -130,10 +128,9 @@ def get_seed_nodes(  # noqa: C901
 
     if monero_network == ALL_NETWORK_MDOES:
         return interesting
-    else:
-        result = {monero_network: interesting[monero_network]}
-        log.info(result)
-        return result
+    result = {monero_network: interesting[monero_network]}
+    log.info(result)
+    return result
 
 
 def main():
