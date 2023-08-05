@@ -143,17 +143,15 @@ def get_last_and_next_hardfork(  # noqa: C901
     rpc_connection = AuthServiceProxy(
         service_url=daemon_address, timeout=timeout
     )
-    for i, line in enumerate(lines):
-        line = line.strip()
-        if line:
+    for line in lines:
+        if line := line.strip():
             if start_line.match(line):
                 interesting_range = True
             if end_line.match(line) and interesting_range:
                 interesting_range = False
                 break
             if interesting_range:
-                info_match = info_line.match(line)
-                if info_match:
+                if info_match := info_line.match(line):
                     fork_info = list(info_line.finditer(line))
                     version = fork_info[0].group(1)
                     block = fork_info[0].group(2)
